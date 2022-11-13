@@ -83,8 +83,9 @@ class Grafo:
         Args: v vértice que se quiere eliminar
         Returns: None
         """
-        pos = self.vertices.index(v)
-        self.vertices.pop(pos)
+        if v in self.vertices:
+            pos = self.vertices.index(v)
+            self.vertices.pop(pos)
         return
 
     def eliminar_arista(self, s: object, t: object) -> None:
@@ -97,12 +98,16 @@ class Grafo:
             t: vértice de destino de la arista
         Returns: None
         """
-        for i in range(len(self.aristas)):
-            if (self.aristas[i].vertice1 == s and self.aristas[i].vertice2 == t) or (self.aristas[i].vertice1 == t and self.aristas[i].vertice2 == s):
-                self.aristas.pop(i)
-                return
-        
-        print("No se ha encontrado arista")
+        if (s in self.vertices) and (t in self.vertices):
+            for i in range(len(self.aristas)):
+                if (self.aristas[i].vertice1 == s and self.aristas[i].vertice2 == t) or (self.aristas[i].vertice1 == t and self.aristas[i].vertice2 == s):
+                    self.aristas.pop(i)
+                    return
+            print("No se ha encontrado arista")
+            return
+        else:
+            print("No se ha encontrado algun vertice")
+            return
 
     def obtener_arista(self, s: object, t: object) -> Tuple[object,float] or None:
         """
@@ -115,13 +120,18 @@ class Grafo:
         Returns: Una tupla (a,w) con los datos de la arista "a" y su peso
         "w" si la arista existe. None en caso contrario.
         """
-        for i in range(len(self.aristas)):
-            if (self.aristas[i].vertice1 == s and self.aristas[i].vertice2 == t) or (self.aristas[i].vertice1 == t and self.aristas[i].vertice2 == s):
-                data = self.aristas[i].data
-                weight = self.aristas[i].weight
-                return (data, weight)
+        if (s in self.vertices) and (t in self.vertices):
+            for i in range(len(self.aristas)):
+                if (self.aristas[i].vertice1 == s and self.aristas[i].vertice2 == t) or (self.aristas[i].vertice1 == t and self.aristas[i].vertice2 == s):
+                    data = self.aristas[i].data
+                    weight = self.aristas[i].weight
+                    return (data, weight)
+            print("No se ha encontrado arista")
+            return
+        else:
+            print("No se ha encontrado algun vertice")
+            return
         
-        print("No se ha encontrado arista")
 
     def lista_adyacencia(self, u: object) -> List[object] or None:
         """
@@ -133,7 +143,16 @@ class Grafo:
         adyacentes a u si u es un vértice del grafo y None en caso
         contrario
         """
-        pass
+        lista = []
+        if u in self.vertices:
+            for ar in range(len(self.aristas)):
+                if self.aristas[ar].vertice1 == u:
+                    lista.append(self.aristas[ar].vertice2)
+                elif self.aristas[ar].vertice2 == u:
+                    lista.append(self.aristas[ar].vertice1)
+            return lista
+        else:
+            return
 
     #### Grados de vértices ####
 
