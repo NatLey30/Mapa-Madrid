@@ -11,7 +11,7 @@ class Grafo:
 
     # Diseñar y construir la clase grafo
 
-    def __init__(self, dirigido = False):
+    def __init__(self, dirigido=False):
         """
         Crea un grafo dirigido o no dirigido.
         Args:
@@ -42,7 +42,7 @@ class Grafo:
         if v not in self.vertices:
             if v is None:
                 raise ValueError("None cannot be a node")
-            vertice = Vertice(v)
+            vertice = Vertice(v[0], v[1])
             self.vertices.append(vertice)
         return
 
@@ -62,12 +62,12 @@ class Grafo:
         if s not in self.vertices:
             if s is None:
                 raise ValueError("None cannot be a node")
-            vertice = Vertice(s)
+            vertice = Vertice(s[0], s[1])
             self.vertices.append(vertice)
         if t not in self.vertices:
             if t is None:
                 raise ValueError("None cannot be a node")
-            vertice = Vertice(t)
+            vertice = Vertice(t[0], t[1])
             self.vertices.append(vertice)
         arista = Arista(s, t, data, weight)
         if arista not in self.aristas:
@@ -176,7 +176,7 @@ class Grafo:
                     grado += 1
                 if not self.es_dirigido() and self.aristas[ar].vertice2 == v:
                     grado += 1
-            return v
+            return grado
         else:
             return
 
@@ -196,7 +196,7 @@ class Grafo:
                     grado += 1
                 if not self.es_dirigido() and self.aristas[ar].vertice1 == v:
                     grado += 1
-            return v
+            return grado
         else:
             return
 
@@ -267,8 +267,10 @@ class Grafo:
 
 
 class Vertice:
-    def __init__(self):
+    def __init__(self, codigo, coordenadas):
         self.vertice = None
+        self.codigo = codigo
+        self.coordenadas = coordenadas
 
 
 class Arista:
@@ -277,20 +279,3 @@ class Arista:
         self.vertice2 = t
         self.data = data
         self.weight = weight
-
-
-if __name__ == "__main__":
-    vertices = Vertice()
-
-    cruces = pd.read_csv('cruces.csv', sep=";",  encoding="LATIN_1")
-    direcciones = pd.read_csv('direcciones.csv', sep=";",  encoding="LATIN_1", low_memory=False)
-
-    # cruces.to_csv('a.csv', index=False)
-
-    for linea in range(len(cruces)):
-        codigo_1 = cruces.loc[linea, 'Codigo de vía tratado']
-        codigo_2 = cruces.loc[linea, 'Codigo de via que cruza o enlaza']
-        coordenada_x = cruces.loc[linea, 'Coordenada X (Guia Urbana) cm (cruce)']
-        coordenada_y = cruces.loc[linea, 'Coordenada Y (Guia Urbana) cm (cruce)']
-        longitud = cruces.loc[linea, 'Longitud en S R  WGS84 (cruce)']
-        latitud = cruces.loc[linea, 'Latitud en S R  WGS84 (cruce)']
