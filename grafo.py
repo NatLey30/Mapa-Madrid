@@ -6,6 +6,7 @@ import pandas as pd
 
 INFTY = sys.float_info.max
 
+
 class Grafo:
 
     # Diseñar y construir la clase grafo
@@ -30,10 +31,7 @@ class Grafo:
         Args: None
         Returns: True si el grafo es dirigido, False si no.
         """
-        if self.dirigido == True:
-            return True
-        else:
-            return False
+        return self.dirigido
 
     def agregar_vertice(self, v: object) -> None:
         """
@@ -74,8 +72,12 @@ class Grafo:
         arista = Arista(s, t, data, weight)
         if arista not in self.aristas:
             self.aristas.append(arista)
+        # if not self.dirigido:
+        #     arista = Arista(t, s, data, weight)
+        #     if arista not in self.aristas:
+        #         self.aristas.append(arista)
         return
-    
+
     def eliminar_vertice(self, v: object) -> None:
         """
         Si el objeto v es un vértice del grafo lo elimiina.
@@ -86,6 +88,9 @@ class Grafo:
         if v in self.vertices:
             pos = self.vertices.index(v)
             self.vertices.pop(pos)
+            for i in range(len(self.aristas)):
+                if (self.aristas[i].vertice1 == v or self.aristas[i].vertice2 == v):
+                    self.aristas.pop(i)
         return
 
     def eliminar_arista(self, s: object, t: object) -> None:
@@ -130,8 +135,7 @@ class Grafo:
             return
         else:
             print("No se ha encontrado algun vertice")
-            return
-        
+            return 
 
     def lista_adyacencia(self, u: object) -> List[object] or None:
         """
@@ -165,7 +169,16 @@ class Grafo:
         Returns: El grado saliente (int) si el vértice existe y
         None en caso contrario.
         """
-        pass
+        grado = 0
+        if v in self.vertices:
+            for ar in range(len(self.aristas)):
+                if self.aristas[ar].vertice1 == v:
+                    grado += 1
+                if not self.es_dirigido() and self.aristas[ar].vertice2 == v:
+                    grado += 1
+            return v
+        else:
+            return
 
     def grado_entrante(self, v: object) -> int or None:
         """
@@ -176,11 +189,20 @@ class Grafo:
         Returns: El grado entrante (int) si el vértice existe y
         None en caso contrario.
         """
-        pass
+        grado = 0
+        if v in self.vertices:
+            for ar in range(len(self.aristas)):
+                if self.aristas[ar].vertice2 == v:
+                    grado += 1
+                if not self.es_dirigido() and self.aristas[ar].vertice1 == v:
+                    grado += 1
+            return v
+        else:
+            return
 
     def grado(self, v: object) -> int or None:
         """
-        Si el objeto u es un vértice del grafo, devuelve
+        Si el objeto v es un vértice del grafo, devuelve
         su grado si el grafo no es dirigido y su grado saliente si
         es dirigido.
         Si no pertenece al grafo, devuelve None.
@@ -188,11 +210,14 @@ class Grafo:
         Returns: El grado (int) o grado saliente (int) según corresponda
         si el vértice existe y None en caso contrario.
         """
-        pass
-
+        if v in self.vertices:
+            return self.grado_saliente(v)
+        else:
+            return
 
     #### Algoritmos ####
-    def dijkstra(self, origen: object) -> Dict[object,object]:
+
+    def dijkstra(self, origen: object) -> Dict[object, object]:
         """
         Calcula un Árbol Abarcador Mínimo para el grafo partiendo
         del vértice "origen" usando el algoritmo de Dijkstra. Calcula únicamente
@@ -206,8 +231,7 @@ class Grafo:
     def camino_minimo(self, origen: object, destino: object) -> List[object]:
         pass
 
-
-    def prim(self) -> Dict[object,object]:
+    def prim(self) -> Dict[object, object]:
         """
         Calcula un Árbol Abarcador Mínimo para el grafo
         usando el algoritmo de Prim.
@@ -217,8 +241,7 @@ class Grafo:
         """
         pass
 
-
-    def kruskal(self) -> List[Tuple[object,object]]:
+    def kruskal(self) -> List[Tuple[object, object]]:
         """
         Calcula un Árbol Abarcador Mínimo para el grafo
         usando el algoritmo de Prim.
@@ -229,8 +252,8 @@ class Grafo:
         """
         pass
 
-
     #### NetworkX ####
+
     def convertir_a_NetworkX(self) -> nx.Graph or nx.DiGraph:
         """
         Construye un grafo o digrafo de Networkx según corresponda
@@ -242,9 +265,11 @@ class Grafo:
         """
         pass
 
+
 class Vertice:
-    def __init__(self, v):
-        self.vertice = v
+    def __init__(self):
+        self.vertice = None
+
 
 class Arista:
     def __init__(self, s: object, t: object, data: object, weight: float) -> None:
@@ -253,6 +278,19 @@ class Arista:
         self.data = data
         self.weight = weight
 
+
 if __name__ == "__main__":
-    cruces = pd.read_csv('cruces.csv',sep = ",",encoding="LATIN_1")
-    direcciones = pd.read_csv('direcciones.csv',sep = ",",encoding="LATIN_1")
+    vertices = Vertice()
+
+    cruces = pd.read_csv('cruces.csv', sep=";",  encoding="LATIN_1")
+    direcciones = pd.read_csv('direcciones.csv', sep=";",  encoding="LATIN_1", low_memory=False)
+
+    # cruces.to_csv('a.csv', index=False)
+
+    for linea in range(len(cruces)):
+        codigo_1 = cruces.loc[linea, 'Codigo de vía tratado']
+        codigo_2 = cruces.loc[linea, 'Codigo de via que cruza o enlaza']
+        coordenada_x = cruces.loc[linea, 'Coordenada X (Guia Urbana) cm (cruce)']
+        coordenada_y = cruces.loc[linea, 'Coordenada Y (Guia Urbana) cm (cruce)']
+        longitud = cruces.loc[linea, 'Longitud en S R  WGS84 (cruce)']
+        latitud = cruces.loc[linea, 'Latitud en S R  WGS84 (cruce)']
