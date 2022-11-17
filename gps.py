@@ -30,5 +30,9 @@ if __name__ == "__main__":
     for linea in range(len(cruces)):
         codigo = [int(cruces.loc[linea, 'Codigo de vía tratado']), int(cruces.loc[linea, 'Codigo de via que cruza o enlaza'])]
         coordenadas = [int(cruces.loc[linea, 'Coordenada X (Guia Urbana) cm (cruce)']), int(cruces.loc[linea, 'Coordenada Y (Guia Urbana) cm (cruce)'])]
+
+        # pos = cruces[cruces['Codigo de via que cruza o enlaza'] == codigo[0]]
+        # pos = pos[pos['Codigo de vía tratado'] == codigo[1]].index[0]
+
         v = [codigo, coordenadas]
         grafo_madrid.agregar_vertice(v)
