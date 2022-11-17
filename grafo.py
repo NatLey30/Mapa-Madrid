@@ -3,6 +3,7 @@ import sys
 from typing import Dict, List, Tuple
 import networkx as nx
 import pandas as pd
+import math
 
 INFTY = sys.float_info.max
 
@@ -226,7 +227,24 @@ class Grafo:
         Returns: Devuelve un diccionario que indica, para cada vértice alcanzable
         desde "origen", qué vértice es su padre en el árbol abarcador mínimo.
         """
-        pass
+        for v in self.vertices:
+            padre[v] = None
+            visitado[v] = False
+            d[v] = math.inf
+        
+        d[origen] = 0
+        Q = sorted([origen],v[d])
+        while Q != None:
+            Q.pop(Q[0])             #Creo que la lista es de menor a mayor
+                                    #Quito el primer elemento
+            if visitado[v] == False:
+                visitado[v] = True
+                for w in N:
+                    if d[w] > d[v] + c:
+                        d[w] = d[v] + c
+                        padre[w] = v
+                        Q.append(v)
+        return padre
 
     def camino_minimo(self, origen: object, destino: object) -> List[object]:
         pass
@@ -239,7 +257,22 @@ class Grafo:
         Returns: Devuelve un diccionario que indica, para cada vértice del
         grafo, qué vértice es su padre en el árbol abarcador mínimo.
         """
-        pass
+        padres = []
+        coste_minimo = []
+        Q = sorted([],coste_minimo)
+        for v in self.vertices:
+            coste_minimo[v] = math.inf
+            Q.append(v)
+        while Q != None:
+            Q.pop(Q[0]) 
+            for w in N and Q:
+                if c < coste_minimo[w]:
+                    coste_minimo[w] = c
+                    padre[w] = v
+                    w.peso = c
+        return padre
+
+        
 
     def kruskal(self) -> List[Tuple[object, object]]:
         """
