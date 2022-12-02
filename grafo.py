@@ -3,6 +3,7 @@ import sys
 from typing import Dict, List, Tuple
 import networkx as nx
 import pandas as pd
+import ast
 
 INFTY = sys.float_info.max
 
@@ -11,7 +12,7 @@ class Grafo:
 
     # Diseñar y construir la clase grafo
 
-    def __init__(self, dirigido=False):
+    def __init__(self, dirigido):
         """
         Crea un grafo dirigido o no dirigido.
         Args:
@@ -88,12 +89,20 @@ class Grafo:
             vertice = self.vertices[v]
             # Lista de adyacencia de v
             lista = list(vertice.adyacencia.keys())
-            # Para cada vertice adyacente con v
-            # eliminamos v de su lista de ayacencia
-            for i in lista:
-                print(i)
-                vertice_a = self.vertices[i]
-                vertice_a.adyacencia.pop(v, None)
+            if self.es_dirigido():  # Si el grafo es dirigido
+                # Para cada vertice del grafo
+                for j in self.vertices:
+                    vertice_j = self.vertices[j]
+                    lista_j = list(vertice_j.adyacencia.keys())
+                    if v in lista_j:  # Si v está en la lista de adyacencia
+                        # Lo eliminamos de esta
+                        vertice_j.adyacencia.pop(v, None)
+            else:  # Si no es dirigido
+                # Para cada vertice adyacente con v
+                # eliminamos v de su lista de ayacencia
+                for i in lista:
+                    vertice_a = self.vertices[i]
+                    vertice_a.adyacencia.pop(v, None)
             self.vertices.pop(v, None)
 
     def eliminar_arista(self, s: object, t: object) -> None:
@@ -106,11 +115,29 @@ class Grafo:
             t: vértice de destino de la arista
         Returns: None
         """
-        # Eliminamso los dos vertices
-        self.eliminar_vertice(s)
-        self.eliminar_vertice(t)
 
-    def obtener_arista(self, s: object, t: object) -> Tuple[object,float] or None:
+        if s in self.vertices:
+            # Objeto vertice
+            vertice_s = self.vertices[s]
+            # Lista de adyacencia de s
+            lista = list(vertice_s.adyacencia.keys())
+            # Si el vertice t es adyacente con s
+            # lo eliminamos de su lista de ayacencia
+            if t in lista:
+                vertice_s.adyacencia.pop(t, None)
+
+        # Si no es dirigido
+        if not self.es_dirigido() and t in self.vertices:
+            # Objeto vertice
+            vertice_t = self.vertices[t]
+            # Lista de adyacencia de s
+            lista = list(vertice_t.adyacencia.keys())
+            # Si el vertice s es adyacente con t
+            # lo eliminamos de su lista de ayacencia
+            if s in lista:
+                vertice_t.adyacencia.pop(s, None)
+
+    def obtener_arista(self, s: object, t: object) -> Tuple[object, float] or None:
         """
         Si los objetos s y t son vértices del grafo y existe
         una arista de u a v, devuelve sus datos y su peso en una tupla.
@@ -239,8 +266,8 @@ class Grafo:
                     # Si ese vértice adyacente no había sido visitado
                     if not visitado[w]:
                         # Recalculamos distancias
-                        if d[w] > d[v] + self.vertices[v].adyacencia[w][0]:
-                            d[w] = d[v] + self.vertices[v].adyacencia[w][0]
+                        if d[w] > d[v] + self.vertices[v].adyacencia[w][1]:
+                            d[w] = d[v] + self.vertices[v].adyacencia[w][1]
                             padre[w] = v
                 # Volvemos a ordenar los vértices
                 d.pop(v, None)
@@ -295,8 +322,8 @@ class Grafo:
             for w in self.vertices[v].adyacencia:
                 if w in Q:
                     # Actualizamos los costes
-                    if coste_minimo[w] > self.vertices[v].adyacencia[w][0]:
-                        coste_minimo[w] = self.vertices[v].adyacencia[w][0]
+                    if coste_minimo[w] > self.vertices[v].adyacencia[w][1]:
+                        coste_minimo[w] = self.vertices[v].adyacencia[w][1]
                         padre[w] = v
             # Volvemos a ordenar los vértices
             coste_minimo.pop(v, None)
@@ -311,7 +338,55 @@ class Grafo:
         de los pares de vértices del grafo
         que forman las aristas del arbol abarcador mínimo.
         """
-        pass
+        dict = {}
+        c = []
+        for v in self.vertices:
+            c.append([v])
+            # Objeto vertice
+            vertice = self.vertices[v]
+            # Lista de adyacencia de v
+            lista_a = list(vertice.adyacencia.keys())
+            for u in lista_a:  # Si el vertice t es adyacente con s
+                ar = [v, u]
+                ar.sort()
+                aristas = list(dict.values())
+                if ar not in aristas:
+                    peso = self.vertices[v].adyacencia[u][1]
+                    dict[str(ar)] = peso
+
+        L = sorted(dict, key=dict.get)
+
+        aristas_conexas = []
+        while L != []:
+            a = ast.literal_eval(L.pop(0))
+            v = a[0]
+            u = a[1]
+            for k in c:
+                if (v in k):
+                    com_v = k
+                if (u in k):
+                    com_u = k
+            
+            if com_u != com_v:
+                c.remove(com_u)
+                c.remove(com_v)
+            else:
+                c.remove(com_v)
+
+            if not self.comun(com_v, com_u):
+                joined = com_v + com_u
+                c.append(joined)
+                aristas_conexas.append(a)
+            else:
+                c.append(com_v)
+        
+        return aristas_conexas
+
+    def comun(self, l1, l2):
+        for j in l1:
+            if j in l2:
+                return True
+        return False
 
     #### NetworkX ####
 
@@ -334,18 +409,17 @@ class Vertice:
 
 
 if '__main__' == __name__:
-    g = Grafo()
+    g = Grafo(False)
 
-    g.agregar_arista('v', 'a', 3, 0)
-    g.agregar_arista('v', 'b', 9, 0)
-    g.agregar_arista('v', 'c', 7, 0)
-    g.agregar_arista('a', 'b', 5, 0)
-    g.agregar_arista('a', 'd', 6, 0)
-    g.agregar_arista('b', 'd', 1, 0)
-    g.agregar_arista('a', 'e', 8, 0)
-    g.agregar_arista('e', 'c', 5, 0)
-    g.agregar_arista('c', 'b', 2, 0)
-    g.agregar_arista('d', 'e', 1, 0)
+    g.agregar_arista('A', 'E', 0, 3)
+    g.agregar_arista('E', 'D', 0, 2)
+    g.agregar_arista('D', 'C', 0, 4)
+    g.agregar_arista('C', 'B', 0, 3)
+    g.agregar_arista('B', 'A', 0, 5)
+    g.agregar_arista('A', 'F', 0, 8)
+    g.agregar_arista('D', 'F', 0, 3)
+    g.agregar_arista('C', 'F', 0, 6)
+    g.agregar_arista('B', 'F', 0, 5)
+    g.agregar_arista('E', 'F', 0, 4)
 
-    print(g.dijkstra('v'))
-    print(g.prim())
+    print(g.kruskal())
