@@ -407,8 +407,14 @@ class Grafo:
         # vertices
         vertices = list(self.vertices.keys())
         G.add_nodes_from(vertices)
-        
+
         # aristas
+        for v in self.vertices:
+            ady = self.lista_adyacencia(v)
+            for u in ady:
+                if v != u:
+                    G.add_edge(v, u)
+
         return G
 
 
