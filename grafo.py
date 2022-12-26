@@ -41,12 +41,12 @@ class Grafo:
         Returns: None
         """
         # Solo si v no está en el grafo, se añade
-        if v not in self.vertices:
+        if str(v) not in self.vertices:
             # Si es none -> Error
             if v is None:
                 raise ValueError("None cannot be a node")
             vertice = Vertice(v)
-            self.vertices[v] = vertice
+            self.vertices[str(v)] = vertice
 
     def agregar_arista(self, s: object, t: object, data: object, weight: float) -> None:
         """
@@ -66,16 +66,16 @@ class Grafo:
         self.agregar_vertice(t)
 
         # Si t no está en la lista de adyacencia de s, se añade
-        vertice_s = self.vertices[s]
-        if t not in vertice_s.adyacencia:
-            vertice_s.adyacencia[t] = [data, weight]
+        vertice_s = self.vertices[str(s)]
+        if str(t) not in vertice_s.adyacencia:
+            vertice_s.adyacencia[str(t)] = [data, weight]
 
         # Si no es dirigido el grafo se añade del sentido contrario
         if not self.es_dirigido():
             # Si s no está en la lista de adyacencia de t, se añade
-            vertice_t = self.vertices[t]
-            if s not in vertice_s.adyacencia:
-                vertice_t.adyacencia[s] = [data, weight]
+            vertice_t = self.vertices[str(t)]
+            if str(s) not in vertice_s.adyacencia:
+                vertice_t.adyacencia[str(s)] = [data, weight]
 
     def eliminar_vertice(self, v: object) -> None:
         """
@@ -84,9 +84,9 @@ class Grafo:
         Args: v vértice que se quiere eliminar
         Returns: None
         """
-        if v in self.vertices:
+        if str(v) in self.vertices:
             # Objeto vertice
-            vertice = self.vertices[v]
+            vertice = self.vertices[str(v)]
             # Lista de adyacencia de v
             lista = list(vertice.adyacencia.keys())
             if self.es_dirigido():  # Si el grafo es dirigido
@@ -94,15 +94,15 @@ class Grafo:
                 for j in self.vertices:
                     vertice_j = self.vertices[j]
                     lista_j = list(vertice_j.adyacencia.keys())
-                    if v in lista_j:  # Si v está en la lista de adyacencia
+                    if str(v) in lista_j:  # Si v está en la lista de adyacencia
                         # Lo eliminamos de esta
-                        vertice_j.adyacencia.pop(v, None)
+                        vertice_j.adyacencia.pop(str(v), None)
             else:  # Si no es dirigido
                 # Para cada vertice adyacente con v
                 # eliminamos v de su lista de ayacencia
                 for i in lista:
                     vertice_a = self.vertices[i]
-                    vertice_a.adyacencia.pop(v, None)
+                    vertice_a.adyacencia.pop(str(v), None)
             self.vertices.pop(v, None)
 
     def eliminar_arista(self, s: object, t: object) -> None:
@@ -116,26 +116,26 @@ class Grafo:
         Returns: None
         """
 
-        if s in self.vertices:
+        if str(s) in self.vertices:
             # Objeto vertice
-            vertice_s = self.vertices[s]
+            vertice_s = self.vertices[str(s)]
             # Lista de adyacencia de s
             lista = list(vertice_s.adyacencia.keys())
             # Si el vertice t es adyacente con s
             # lo eliminamos de su lista de ayacencia
-            if t in lista:
-                vertice_s.adyacencia.pop(t, None)
+            if str(t) in lista:
+                vertice_s.adyacencia.pop(str(t), None)
 
         # Si no es dirigido
-        if not self.es_dirigido() and t in self.vertices:
+        if not self.es_dirigido() and str(t) in self.vertices:
             # Objeto vertice
-            vertice_t = self.vertices[t]
+            vertice_t = self.vertices[str(t)]
             # Lista de adyacencia de s
             lista = list(vertice_t.adyacencia.keys())
             # Si el vertice s es adyacente con t
             # lo eliminamos de su lista de ayacencia
-            if s in lista:
-                vertice_t.adyacencia.pop(s, None)
+            if str(s) in lista:
+                vertice_t.adyacencia.pop(str(s), None)
 
     def obtener_arista(self, s: object, t: object) -> Tuple[object, float] or None:
         """
@@ -148,16 +148,16 @@ class Grafo:
         Returns: Una tupla (a,w) con los datos de la arista "a" y su peso
         "w" si la arista existe. None en caso contrario.
         """
-        if (s in self.vertices) and (t in self.vertices): 
+        if (str(s) in self.vertices) and (str(t) in self.vertices):
             try:
-                vertice = self.vertices[s]
+                vertice = self.vertices[str(s)]
                 # Lista de adyacencia de s
-                datos = vertice.adyacencia[t]
+                datos = vertice.adyacencia[str(t)]
                 return datos
             except:
-                vertice = self.vertices[t]
+                vertice = self.vertices[str(t)]
                 # Lista de adyacencia de s
-                datos = vertice.adyacencia[s]
+                datos = vertice.adyacencia[str(s)]
                 return datos
 
     def lista_adyacencia(self, u: object) -> List[object] or None:
@@ -170,8 +170,8 @@ class Grafo:
         adyacentes a u si u es un vértice del grafo y None en caso
         contrario
         """
-        if u in self.vertices:
-            vertice = self.vertices[u]
+        if str(u) in self.vertices:
+            vertice = self.vertices[str(u)]
             return list(vertice.adyacencia.keys())
 
     #### Grados de vértices ####
@@ -187,8 +187,8 @@ class Grafo:
         """
         # El grado saliente es el número de vertices que haya en
         # su lista de adyacencia
-        if v in self.vertices:
-            vertice = self.vertices[v]
+        if str(v) in self.vertices:
+            vertice = self.vertices[str(v)]
             return len(list(vertice.adyacencia.keys()))
 
     def grado_entrante(self, v: object) -> int or None:
@@ -200,13 +200,13 @@ class Grafo:
         Returns: El grado entrante (int) si el vértice existe y
         None en caso contrario.
         """
-        if v in self.vertices:
+        if str(v) in self.vertices:
             grado = 0
             # Para cada vertice en el diccionario vertices
             for w in list(self.vertices.keys()):
                 vertice = self.vertices[w]
                 # Si v está en su diccionario de adyacencia
-                if v in list(vertice.adyacencia.keys()):
+                if str(v) in list(vertice.adyacencia.keys()):
                     # Sumamos 1 al grado del grafo
                     grado += 1
             return grado
@@ -224,7 +224,7 @@ class Grafo:
         # Como para los grafos no dirigidos el grado entrante y el saliente
         # son iguales, y para los dirigidos hay que devolver el saliente,
         # para los dos devolvemos el saliente
-        if v in self.vertices:
+        if str(v) in self.vertices:
             return self.grado_saliente(v)
 
     #### Algoritmos ####
@@ -248,7 +248,7 @@ class Grafo:
             d[v] = INFTY
 
         # La distancia del punto de partida es 0
-        d[origen] = 0
+        d[str(origen)] = 0
 
         # Ordenamos los vértices de menor a mayor distancia
         Q = sorted(d, key=d.get)
@@ -366,7 +366,7 @@ class Grafo:
                     com_v = k
                 if (u in k):
                     com_u = k
-            
+
             if com_u != com_v:
                 c.remove(com_u)
                 c.remove(com_v)
@@ -379,7 +379,7 @@ class Grafo:
                 aristas_conexas.append(a)
             else:
                 c.append(com_v)
-        
+
         return aristas_conexas
 
     def comun(self, l1, l2):
@@ -399,27 +399,20 @@ class Grafo:
         no dirigido y un objeto DiGraph si es dirigido. En ambos casos,
         los vértices y las aristas son los contenidos en el grafo dado.
         """
-        pass
+        if self.es_dirigido():
+            G = nx.DiGraph()
+        else:
+            G = nx.Graph()
+
+        # vertices
+        vertices = list(self.vertices.keys())
+        G.add_nodes_from(vertices)
+        
+        # aristas
+        return G
 
 
 class Vertice:
     def __init__(self, datos):
         self.datos = datos
         self.adyacencia = {}
-
-
-if '__main__' == __name__:
-    g = Grafo(False)
-
-    g.agregar_arista('A', 'E', 0, 3)
-    g.agregar_arista('E', 'D', 0, 2)
-    g.agregar_arista('D', 'C', 0, 4)
-    g.agregar_arista('C', 'B', 0, 3)
-    g.agregar_arista('B', 'A', 0, 5)
-    g.agregar_arista('A', 'F', 0, 8)
-    g.agregar_arista('D', 'F', 0, 3)
-    g.agregar_arista('C', 'F', 0, 6)
-    g.agregar_arista('B', 'F', 0, 5)
-    g.agregar_arista('E', 'F', 0, 4)
-
-    print(g.kruskal())
