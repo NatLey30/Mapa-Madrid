@@ -74,6 +74,7 @@ def cercano(u, dir, coordenada, grafo_madrid):
             if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
                 coordenadas_c = (c[0], c[1])
                 w = v
+        print(coordenadas_c)
 
     grafo_madrid.agregar_arista(u, w, None, 1)
 
@@ -205,6 +206,13 @@ if __name__ == "__main__":
         # Buscamos la ruta
         camino = grafo_madrid.camino_minimo('origen', 'destino')
         print(camino)
+
+        aristas_camino = []
+        for i in range(len(camino)-2):
+            arista = (camino[i],camino[i+1])
+            aristas_camino.append(arista)
+        print(aristas_camino)
+
 
         # Pasamos a NetworkX
         # Sacamos las posiciones de los vértices

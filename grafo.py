@@ -287,7 +287,6 @@ class Grafo:
         """
 
         padre = self.dijkstra(origen)
-        print(padre)
         vertice = destino
         camino = [vertice]
         while vertice != origen:
