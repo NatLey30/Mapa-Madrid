@@ -46,23 +46,7 @@ def cercano(u, dir, coordenada, grafo_madrid):
         grafo_madrid: grafo al que se añade
     Return: None
     '''
-    coordenadas_c = (INFTY, INFTY)
-    # df = cruces[cruces['Literal completo del vial tratado'].str.contains(dir, case=False)].reset_index()
-    # calle = ''
-
-    # for index, row in df.iterrows():
-    #     x = row['Coordenada X (Guia Urbana) cm (cruce)']
-    #     y = row['Coordenada Y (Guia Urbana) cm (cruce)']
-    #     resta_x = abs(coordenada[0] - x)
-    #     resta_y = abs(coordenada[0] - y)
-    #     if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
-    #         coordenadas_c = (x, y)
-    #         calle = row['Literal completo del vial que cruza'].strip()
-
-    # w = [dir, calle]
-    # w.sort()
-    # w.append(coordenadas_c)
-    # print(w)
+    dist = INFTY
 
     w = None
     for v in grafo_madrid.vertices:
@@ -70,11 +54,11 @@ def cercano(u, dir, coordenada, grafo_madrid):
             vertice = grafo_madrid.vertices[v]
             c = vertice.datos[2]
             resta_x = abs(coordenada[0] - int(c[0]))
-            resta_y = abs(coordenada[0] - int(c[1]))
-            if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
-                coordenadas_c = (c[0], c[1])
+            resta_y = abs(coordenada[1] - int(c[1]))
+            d = math.sqrt((resta_x^2) + (resta_y^2))
+            if d < dist:
+                dist = d
                 w = v
-        print(coordenadas_c)
 
     grafo_madrid.agregar_arista(u, w, None, 1)
 
@@ -205,13 +189,12 @@ if __name__ == "__main__":
 
         # Buscamos la ruta
         camino = grafo_madrid.camino_minimo('origen', 'destino')
-        print(camino)
 
-        aristas_camino = []
-        for i in range(len(camino)-2):
-            arista = (camino[i],camino[i+1])
-            aristas_camino.append(arista)
-        print(aristas_camino)
+        # aristas_camino = []
+        # for i in range(len(camino)-2):
+        #     arista = (camino[i],camino[i+1])
+        #     aristas_camino.append(arista)
+        # print(aristas_camino)
 
 
         # Pasamos a NetworkX
@@ -233,9 +216,10 @@ if __name__ == "__main__":
         # Pintamos
         plot = plt.plot()
         nx.draw(G, pos=pos, node_size=0.1, width=0.1, edge_color='k')
-        # nx.draw(camino, pos=pos, edge_color='b')
-        nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen'], node_size=5, node_color='g')
-        nx.draw_networkx_nodes(G, pos=pos, nodelist=['destino'], node_size=5, node_color='r')
+        # nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen'], node_size=5, node_color='g')
+        nx.draw_networkx_nodes(G, pos=pos, nodelist=camino, node_size=5, node_color='r')
+        nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen', 'destino'], node_size=20, node_color='r')
+        nx.draw_networkx_labels(G, pos=pos, labels={'origen': 'origen', 'destino': 'destino'})
         plt.show()
 
         origen = input("Introduzca la dirección completa del origen tal y como está en la base de datos (Presione intro para finalizar): ")
