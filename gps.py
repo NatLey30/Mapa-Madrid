@@ -234,7 +234,8 @@ if __name__ == "__main__":
         plot = plt.plot()
         nx.draw(G, pos=pos, node_size=0.1, width=0.1, edge_color='k')
         # nx.draw(camino, pos=pos, edge_color='b')
-        nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen', 'destino'], node_size=5, node_color='r')
+        nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen'], node_size=5, node_color='g')
+        nx.draw_networkx_nodes(G, pos=pos, nodelist=['destino'], node_size=5, node_color='r')
         plt.show()
 
         origen = input("Introduzca la dirección completa del origen tal y como está en la base de datos (Presione intro para finalizar): ")
