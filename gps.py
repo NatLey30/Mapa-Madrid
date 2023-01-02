@@ -3,7 +3,9 @@ import grafo
 import networkx as nx
 import matplotlib.pyplot as plt
 import math
-import re
+import sys
+
+INFTY = sys.float_info.max
 
 
 def datos(direcciones, direccion):
@@ -44,29 +46,43 @@ def cercano(u, dir, coordenada, grafo_madrid):
         grafo_madrid: grafo al que se añade
     Return: None
     '''
-    coordenadas_c = (1000000, 1000000)
-    via = ''
-    df = cruces[cruces['Literal completo del vial tratado'] == dir]
+    coordenadas_c = (INFTY, INFTY)
+    # df = cruces[cruces['Literal completo del vial tratado'].str.contains(dir, case=False)].reset_index()
+    # calle = ''
 
-    for index, row in df.iterrows():
-        x = row['Coordenada X (Guia Urbana) cm (cruce)']
-        y = row['Coordenada Y (Guia Urbana) cm (cruce)']
-        resta_x = abs(coordenada[0] - x)
-        resta_y = abs(coordenada[0] - y)
-        if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
-            coordenadas_c = (x, y)
+    # for index, row in df.iterrows():
+    #     x = row['Coordenada X (Guia Urbana) cm (cruce)']
+    #     y = row['Coordenada Y (Guia Urbana) cm (cruce)']
+    #     resta_x = abs(coordenada[0] - x)
+    #     resta_y = abs(coordenada[0] - y)
+    #     if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
+    #         coordenadas_c = (x, y)
+    #         calle = row['Literal completo del vial que cruza'].strip()
 
+    # w = [dir, calle]
+    # w.sort()
+    # w.append(coordenadas_c)
+    # print(w)
+
+    w = None
     for v in grafo_madrid.vertices:
-        vertice = grafo_madrid.vertices[v]
-        if vertice.datos[2] == coordenadas_c:
-            grafo_madrid.agregar_arista(u, vertice, None, 1)
-            return
+        if v != 'origen' and v != 'destino':
+            vertice = grafo_madrid.vertices[v]
+            c = vertice.datos[2]
+            resta_x = abs(coordenada[0] - int(c[0]))
+            resta_y = abs(coordenada[0] - int(c[1]))
+            if resta_x < coordenadas_c[0] or resta_y < coordenadas_c[0]:
+                coordenadas_c = (c[0], c[1])
+                w = v
+
+    grafo_madrid.agregar_arista(u, w, None, 1)
 
 
 if __name__ == "__main__":
     # ABRIMOS ARCHIVOS #
     cruces = pd.read_csv('cruces.csv', sep=";",  encoding="LATIN_1")
-    direcciones = pd.read_csv('direcciones.csv', sep=";",  encoding="LATIN_1", low_memory=False)
+    direcciones = pd.read_csv('direcciones.csv', sep=";",  encoding="LATIN_1",
+                              low_memory=False)
 
     # GRAFOS #
     grafo_madrid_e = grafo.Grafo(False)
@@ -74,7 +90,8 @@ if __name__ == "__main__":
 
     dict = {}
 
-    # Sacamos una lista con todas las calles que van a estar incluidad en nuestro gps
+    # Sacamos una lista con todas las calles que van a estar incluidas
+    # en nuestro gps
     vias = cruces['Literal completo del vial tratado'].unique()
     for via in vias:
         # Para cada calle cogemos el subdataframe con contiene a esa calle
@@ -100,10 +117,10 @@ if __name__ == "__main__":
             ind2 = pos[pos['Literal completo del vial que cruza'] == calle2prima].reset_index()
 
             # Coordenada de los vertices
-            coorx1 = ind1['Coordenada X (Guia Urbana) cm (cruce)'][0]
-            coory1 = ind1['Coordenada Y (Guia Urbana) cm (cruce)'][0]
-            coorx2 = ind2['Coordenada X (Guia Urbana) cm (cruce)'][0]
-            coory2 = ind2['Coordenada Y (Guia Urbana) cm (cruce)'][0]
+            coorx1 = int(ind1['Coordenada X (Guia Urbana) cm (cruce)'][0])
+            coory1 = int(ind1['Coordenada Y (Guia Urbana) cm (cruce)'][0])
+            coorx2 = int(ind2['Coordenada X (Guia Urbana) cm (cruce)'][0])
+            coory2 = int(ind2['Coordenada Y (Guia Urbana) cm (cruce)'][0])
 
             # Data de cada arista
             data = pos['Clase de la via tratado'][0].strip()
@@ -130,8 +147,12 @@ if __name__ == "__main__":
                 peso = ((dist*0.000001)/50)*60
 
             # Creamos los vértices
-            v = [calle1.strip(), calle2.strip(), (coorx1, coory1)]
-            w = [calle1.strip(), calle2prima.strip(), (coorx2, coory2)]
+            v = [calle1.strip(), calle2.strip()]
+            v.sort()
+            v.append((coorx1, coory1))
+            w = [calle1.strip(), calle2prima.strip()]
+            w.sort()
+            w.append((coorx2, coory2))
 
             # Creamos vertices #
             grafo_madrid_e.agregar_vertice(v)
@@ -155,12 +176,11 @@ if __name__ == "__main__":
         # datos
         dir_o, coordenada_o = datos(direcciones, origen)
         dir_d, coordenada_d = datos(direcciones, destino)
-        print(coordenada_o, coordenada_d)
 
         # El ususario debe decidir si quiere escoger la ruta
         continuar = True
         while continuar:
-            op = str(input('Desea encontrar la ruta más corta(1) o más rápida(2): '))
+            op = str(input('¿Desea encontrar la ruta más corta(1) o más rápida(2)?: '))
             if op == '1' or op == '2':
                 continuar = False
             else:
@@ -175,23 +195,26 @@ if __name__ == "__main__":
         grafo_madrid.agregar_vertice('origen')
         grafo_madrid.agregar_vertice('destino')
 
-        # Buscamos el vértice del grafo más cercano al y añadimos una arista entre estos dos
+        # Buscamos el vértice del grafo más cercano al y añadimos una
+        # arista entre estos dos
         cercano('origen', dir_o, coordenada_o, grafo_madrid)
 
         # Hacemos lo mismo para el destino
         cercano('destino', dir_d, coordenada_d, grafo_madrid)
 
         # Buscamos la ruta
-        camino = grafo_madrid.camino_minimo(origen, destino)
+        camino = grafo_madrid.camino_minimo('origen', 'destino')
+        print(camino)
 
         # Pasamos a NetworkX
         # Sacamos las posiciones de los vértices
         pos = {}
         # Para cada vértice del grafo
         for v in grafo_madrid.vertices:
-            if v != 'origen' or v!= 'destino':
+            if v != 'origen' and v != 'destino':
                 objeto = grafo_madrid.vertices[v]
-                # en la posición 3 de la lista de datos, se encuentran sus coordenadas
+                # en la posición 3 de la lista de datos, se encuentran
+                # sus coordenadas
                 coordenadas = objeto.datos[2]
                 pos[v] = coordenadas
         pos['origen'] = coordenada_o
@@ -201,8 +224,8 @@ if __name__ == "__main__":
 
         # Pintamos
         plot = plt.plot()
-        nx.draw(G, pos=pos, node_size=0.1, edge_color='k')
-        nx.draw(camino, pos=pos, edge_color='b')
+        nx.draw(G, pos=pos, node_size=0.1, width=0.1, edge_color='k')
+        # nx.draw(camino, pos=pos, edge_color='b')
         nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen', 'destino'], node_size=5, node_color='r')
         plt.show()
 

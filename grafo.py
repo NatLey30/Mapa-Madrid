@@ -2,7 +2,6 @@ import heapq
 import sys
 from typing import Dict, List, Tuple
 import networkx as nx
-import pandas as pd
 import ast
 
 INFTY = sys.float_info.max
@@ -231,12 +230,13 @@ class Grafo:
 
     def dijkstra(self, origen: object) -> Dict[object, object]:
         """
-        Calcula un Árbol Abarcador Mínimo para el grafo partiendo
-        del vértice "origen" usando el algoritmo de Dijkstra. Calcula únicamente
+        Calcula un Árbol Abarcador Mínimo para el grafo partiendo del
+        vértice "origen" usando el algoritmo de Dijkstra. Calcula únicamente
         el árbol de la componente conexa que contiene a "origen".
         Args: origen vértice del grafo de origen
-        Returns: Devuelve un diccionario que indica, para cada vértice alcanzable
-        desde "origen", qué vértice es su padre en el árbol abarcador mínimo.
+        Returns: Devuelve un diccionario que indica, para cada vértice
+        alcanzable desde "origen", qué vértice es su padre en el árbol
+        abarcador mínimo.
         """
         # Inicializamos todos los diccionarios
         padre = {}
@@ -252,7 +252,6 @@ class Grafo:
 
         # Ordenamos los vértices de menor a mayor distancia
         Q = sorted(d, key=d.get)
-
         # Recorremos todos los vértices
         while Q != []:
             # Cogemos el vértice más cercano
@@ -276,7 +275,6 @@ class Grafo:
                 d.pop(v, None)
         return padre
 
-
     def camino_minimo(self, origen: object, destino: object) -> List[object]:
         """ Calcula el camino mínimo desde el vértice origen hasta el vértice
         destino utilizando el algoritmo de Dijkstra.
@@ -289,6 +287,7 @@ class Grafo:
         """
 
         padre = self.dijkstra(origen)
+        print(padre)
         vertice = destino
         camino = [vertice]
         while vertice != origen:
@@ -297,7 +296,6 @@ class Grafo:
 
         camino.reverse()
         return camino
-
 
     def prim(self) -> Dict[object, object]:
         """
