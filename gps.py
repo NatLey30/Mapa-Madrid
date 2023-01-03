@@ -126,7 +126,7 @@ if __name__ == "__main__":
                 peso = ((dist*0.000001)/70)*60
             elif data == 'CALLEJON' or data == 'CAMINO':
                 peso = ((dist*0.000001)/30)*60
-            elif data == 'ESTACION DE METRO' or data == 'PLAZUELA' or data == 'PASADIZO' or data == 'COLONIA':
+            elif data == 'ESTACION DE METRO' or data == 'PLAZUELA' or data == 'PASADIZO' or data == 'COLONIA' or data == 'PLAZA':
                 peso = ((dist*0.000001)/20)*60
             else:
                 peso = ((dist*0.000001)/50)*60
@@ -190,12 +190,6 @@ if __name__ == "__main__":
         # Buscamos la ruta
         camino = grafo_madrid.camino_minimo('origen', 'destino')
 
-        # aristas_camino = []
-        # for i in range(len(camino)-2):
-        #     arista = (camino[i],camino[i+1])
-        #     aristas_camino.append(arista)
-        # print(aristas_camino)
-
 
         # Pasamos a NetworkX
         # Sacamos las posiciones de los vértices
@@ -216,11 +210,46 @@ if __name__ == "__main__":
         # Pintamos
         plot = plt.plot()
         nx.draw(G, pos=pos, node_size=0.1, width=0.1, edge_color='k')
-        # nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen'], node_size=5, node_color='g')
         nx.draw_networkx_nodes(G, pos=pos, nodelist=camino, node_size=5, node_color='r')
         nx.draw_networkx_nodes(G, pos=pos, nodelist=['origen', 'destino'], node_size=20, node_color='r')
         nx.draw_networkx_labels(G, pos=pos, labels={'origen': 'origen', 'destino': 'destino'})
         plt.show()
+
+        #Instrucciones
+        recorrido = [origen]
+        distancia = 0
+
+        for i in range(1,len(camino)-2):
+            if i == 1:
+                camino[i] = camino[i].strip('[]').split(', ')
+                avance_x = 0
+                avance_y = 0
+            else:
+                avance_x = abs(int(camino[i][2].strip('('))-int(camino[i-1][2].strip('(')))
+                avance_y = abs(int(camino[i][3].strip(')'))-int(camino[i-1][3].strip(')')))
+            camino[i+1] = camino[i+1].strip('[]').split(', ')
+            distancia += math.sqrt(avance_x^2 + avance_y^2)
+
+            if camino[i][0] in camino[i+1][0]:
+                if recorrido[-1] != camino[i+1][0]:
+                    print('Avanza por {}'.format(camino[i+1][0]))
+                    recorrido.append(camino[i+1][0])
+            elif camino[i][0] in camino[i+1][1]:
+                if recorrido[-1] != camino[i+1][1]:
+                    print('Avanza por {}'.format(camino[i+1][1]))
+                    recorrido.append(camino[i+1][1])
+            elif camino[i][1] in camino[i+1][0]:
+                if recorrido[-1] != camino[i+1][0]:
+                    print('Avanza por {}'.format(camino[i+1][0]))
+                    recorrido.append(camino[i+1][0])
+            elif camino[i][1] in camino[i+1][1]:
+                if recorrido[-1] != camino[i+1][1]:
+                    print('Avanza por {}'.format(camino[i+1][1]))
+                    recorrido.append(camino[i+1][1])
+        tiempo = int((distancia/1.39)/60)
+        print('\nDistancia total recorrida: {} metros'.format(int(distancia)))
+        print('Tardarás {} minutos en llegar andando a tu destino (velocidad media 5 km/h)'.format(tiempo))
+        
 
         origen = input("Introduzca la dirección completa del origen tal y como está en la base de datos (Presione intro para finalizar): ")
         destino = input("Introduzca la dirección completa del destino tal y como está en la base de datos (Presione intro para finalizar): ")
