@@ -23,4 +23,4 @@ The final graph representation is rendered as an image called **`graph.jpg`**, s
 ## Output
 The resulting file, **`graph.jpg`**, displays the reconstructed **road network of Madrid**, with nodes representing crossings and edges representing road connections.
 
-![Madrid Graph](graph.jpg)
+![Madrid Graph](grafp.jpg)
