@@ -2,7 +2,7 @@
 
 ## Project Overview
 This project builds and visualizes a **graph-based map of Madrid** using data extracted from two CSV files — one containing **road intersections (nodes)** and another containing **street connections (edges)**.  
-The final graph representation is rendered as an image called **`graph.jpg`**, showing the road network structure of the city.
+The final graph representation is rendered as an image, showing the road network structure of the city.
 
 ## Data Sources
 - **`cruces.csv`** – Contains the coordinates or identifiers of all intersections in Madrid. Each row represents a node in the graph.  
@@ -10,17 +10,17 @@ The final graph representation is rendered as an image called **`graph.jpg`**, s
 
 ## How It Works
 1. **Data Loading:**  
-   The project reads the two CSV files using a data analysis library (e.g., `pandas`).
+   The project reads the two CSV files using a data analysis library..
 
 2. **Graph Construction:**  
-   The intersections and connections are used to build a **graph structure** (e.g., with `networkx` in Python), where:
+   The intersections and connections are used to build a **graph structure**, where:
    - Nodes = intersections  
    - Edges = roads connecting them  
 
 3. **Visualization:**  
-   The graph is plotted and saved as **`graph.jpg`**, visually representing Madrid’s road network.
+   The graph is plotted and saved, visually representing Madrid’s road network.
 
 ## Output
-The resulting file, **`graph.jpg`**, displays the reconstructed **road network of Madrid**, with nodes representing crossings and edges representing road connections.
+The resulting file, **`grafp.jpg`**, displays the reconstructed **road network of Madrid**, with nodes representing crossings and edges representing road connections.
 
 ![Madrid Graph](grafp.jpg)
